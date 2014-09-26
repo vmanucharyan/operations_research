@@ -16,7 +16,7 @@ class Matrix[T](val rows: Vector[Vector[T]]) {
   def apply(row: Int, col: Int) = rows(row)(col)
   def apply(row: Int) = rows(row)
 
-  def flattenRowBased() =
+  def flat() =
     (for (ri <- 0 until rowCount; ci <- 0 until colCount) yield rows(ri)(ci)).toVector
 
   def map[B](func: (T, Int, Int) => B) =
@@ -93,7 +93,7 @@ class Matrix[T](val rows: Vector[Vector[T]]) {
 
   override def equals(other: Any) : Boolean = {
     def elementsAreEqual(mat: Matrix[T]) =
-      mat.flattenRowBased() equals mat.flattenRowBased()
+      mat.flat() equals mat.flat()
 
     if (!other.isInstanceOf[hungarian_method.Matrix[T]])
       false

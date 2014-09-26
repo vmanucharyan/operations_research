@@ -4,14 +4,16 @@ import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, MutableList}
 
 class HungarianSolver ( matrix: Vector[Vector[Double]],
-                        private val _traceCallback: (Matrix[Cost], String, mutable.Set[Int], mutable.Set[Int]) => Unit ) {
+                        private val _traceCallback: (Matrix[Cost], String, mutable.Set[Int], mutable.Set[Int]) => Unit) {
+
+  def this (matrix: Matrix[Double]) = this(matrix.rows, (_,_,_,_) => {})
 
   private val _inputMatrix = CostMatrix.fromValues(matrix)
   private val _n = _inputMatrix.rowCount
 
   def solve(maximize: Boolean) = {
     def maximizationCostMatrix(mat: Matrix[Cost]) = {
-      val (max, _, _) = mat.zipWithIndexes().flattenRowBased().maxBy{ case (c: Cost, ri: Int, ci: Int) => c.value }
+      val (max, _, _) = mat.zipWithIndexes().flat().maxBy{ case (c: Cost, ri: Int, ci: Int) => c.value }
       mat.map((c, _, _) => { new Cost(-c.value + max.value, false, false) })
     }
     // построение эквивалентной матрицы (C')
@@ -178,8 +180,13 @@ class HungarianSolver ( matrix: Vector[Vector[Double]],
     }
     def optimalMatrix(mat: Matrix[Cost]) =
       mat.map((cost, rowIndex, colIndex) => if (cost.mark1) 1 else 0)
-    def optimalValue(c: Matrix[Cost], x: Matrix[Int]) =
-      c.map((c, ri, ci) => c.value * x(ri, ci)).flattenRowBased().sum
+
+    def optimalValue(c: Matrix[Cost], x: Matrix[Int]) = {
+      c.map((c, ri, ci) => if (!c.value.isInfinity) c.value * x(ri, ci) else 0).
+        flat().
+        sum
+    }
+
 
     val input = if (maximize) maximizationCostMatrix(_inputMatrix) else _inputMatrix
     val eq = equivalentCostMatrix(input)
