@@ -1,5 +1,7 @@
 package hungarian_method
 
+import common.Matrix
+
 import scala.collection.mutable
 
 class Cost(val value: Double, val mark1: Boolean, var mark2: Boolean) {

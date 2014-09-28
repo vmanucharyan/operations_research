@@ -8,7 +8,6 @@ object HungarianMethod {
       Vector(9, 6, 8, 9, 3),
       Vector(9, 3, 9, 4, 3)
     )
-
   val matrix7: Vector[Vector[Double]] =
     Vector(
       Vector(11, 4, 11, 6, 11),
@@ -17,7 +16,6 @@ object HungarianMethod {
       Vector(9, 11, 6, 10, 9),
       Vector(7, 10, 4, 8, 8)
     )
-
   val example: Vector[Vector[Double]] =
     Vector(
       Vector(5, 6, 7, 1),
@@ -25,7 +23,6 @@ object HungarianMethod {
       Vector(8, 5, 3, 5),
       Vector(12, 5, 9, 8)
     )
-
   val example2: Vector[Vector[Double]] =
     Vector(
       Vector(1, 0, 1, 4),

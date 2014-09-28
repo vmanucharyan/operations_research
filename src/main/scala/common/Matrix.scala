@@ -1,4 +1,4 @@
-package hungarian_method
+package common
 
 class Matrix[T](val rows: Vector[Vector[T]]) {
   val colCount = rows(0).length
@@ -95,7 +95,7 @@ class Matrix[T](val rows: Vector[Vector[T]]) {
     def elementsAreEqual(mat: Matrix[T]) =
       mat.flat() equals mat.flat()
 
-    if (!other.isInstanceOf[hungarian_method.Matrix[T]])
+    if (!other.isInstanceOf[Matrix[T]])
       false
     else
       elementsAreEqual(other.asInstanceOf[Matrix[T]])
@@ -105,12 +105,14 @@ class Matrix[T](val rows: Vector[Vector[T]]) {
     val sb = new StringBuilder()
     for (ri <- 0 until rowCount) {
       for (ci <- 0 until colCount) {
-        sb.append(s"${rows(ri)(ci)}\t\t")
+        sb.append(s"${rows(ri)(ci)}\t\t\t")
       }
       sb.append("\n")
     }
 
     sb.toString()
+
+//    rows.toString()
   }
 }
 

@@ -1,5 +1,7 @@
 package hungarian_method
 
+import common.Matrix
+
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, MutableList}
 
@@ -38,7 +40,7 @@ class HungarianSolver ( matrix: Vector[Vector[Double]],
           case (cost, rowIndex) =>
             val mark1 =
               (cost.value == 0) &&
-                (marked.count {case (ri, ci) => (rowIndex == ri) || (colIndex == ci)} == 0)
+                (marked.count {case (ri, ci) => (rowIndex == ri) ы|| (colIndex == ci)} == 0)
 
             if (mark1)
               marked += ((rowIndex, colIndex))
@@ -100,7 +102,8 @@ class HungarianSolver ( matrix: Vector[Vector[Double]],
             (c) =>
               c.value, (c, ri, ci) => c.value > 0 &&
               !markedRows.contains(ri) &&
-              !markedCols.contains(ci)
+              !markedCols.contains(ci) &&
+              !c.value.isInfinity
           )
 
           val transformed =
