@@ -40,7 +40,7 @@ class HungarianSolver ( matrix: Vector[Vector[Double]],
           case (cost, rowIndex) =>
             val mark1 =
               (cost.value == 0) &&
-                (marked.count {case (ri, ci) => (rowIndex == ri) ы|| (colIndex == ci)} == 0)
+                (marked.count {case (ri, ci) => (rowIndex == ri) || (colIndex == ci)} == 0)
 
             if (mark1)
               marked += ((rowIndex, colIndex))
