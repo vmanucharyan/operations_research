@@ -43,8 +43,7 @@ class TspSolverWithBnb {
 
       if (newOptVal > optVal)
         completeTask(newQueue, optVal, destMat)
-      else
-      if (isFullCycle(newDestMat, cycles))
+      else if (isFullCycle(newDestMat, cycles))
         completeTask(newQueue, newOptVal, newDestMat)
       else
         completeTask(addSubTasks(newQueue, cycles, costs), optVal, destMat)
