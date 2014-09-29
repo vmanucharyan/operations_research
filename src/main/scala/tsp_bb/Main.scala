@@ -24,7 +24,27 @@ object Main {
       )
     )
 
-    val tspSolver = new TspSolverWithBnb()
+    val matrixTest = new Matrix[Double](
+      Vector(
+        Vector[Double](0,   7,   1,    8,   7),
+        Vector[Double](  9, 0,   9,    2,   6),
+        Vector[Double](  2,  12, 0,   11,  10),
+        Vector[Double](  9,   9,   12, 0,   4),
+        Vector[Double](  8,   1,   12,  10, 0)
+      )
+    )
+
+    val tspSolver = new TspSolverWithBnb(
+      (tr) => {
+        println(s"Итерация #${tr.iterationNum}:")
+        println(s"Текущая матрица стоимостей:\n${tr.costMat}")
+        println(s"Полученная матрица назначений:\n${tr.destMat}")
+        println(s"f*: ${tr.fs}")
+        println(s"f0: ${tr.f0}")
+        println("================================================================")
+        println()
+      }
+    )
     val (opt, dmat) = tspSolver.solve(matrix)
 
     println(opt)

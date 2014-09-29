@@ -4,11 +4,22 @@ import common.Matrix
 import hungarian_method.HungarianSolver
 import scala.collection.immutable.Queue
 
-class TspSolverWithBnb {
+case class TraceData(iterationNum: Int,
+                     destMat: Matrix[Int],
+                     costMat: Matrix[Double],
+                     f0: Double,
+                     fs: Double)
+
+class TspSolverWithBnb(val traceCallback: (TraceData) => Unit = (_: TraceData) => {}) {
   def solve(costs: Matrix[Double]) = {
     val initialDestinations = buildInitialDestMatrix(costs.rowCount)
     val taskQueue = Queue(costs)
-    val (_, optVal, destMat) = completeTask(taskQueue, optimalValue(initialDestinations, costs), initialDestinations)
+    val (_, optVal, destMat) =
+      completeTask(
+        taskQueue,
+        optimalValue(initialDestinations, costs),
+        initialDestinations, 1
+      )
 
     (optVal, destMat)
   }
@@ -28,9 +39,10 @@ class TspSolverWithBnb {
     new Matrix[Int](
       rowCount = seq.size,
       colCount = seq.size,
-      initializer = (ri, ci) => if (seq(ri) == ci) 1 else 0)
+      initializer = (ri, ci) => if (seq(ri) == ci) 1 else 0
+    )
 
-  private def completeTask(queue: Queue[Matrix[Double]], optVal: Double, destMat: Matrix[Int])
+  private def completeTask(queue: Queue[Matrix[Double]], optVal: Double, destMat: Matrix[Int], iterNum: Int)
   : (Queue[Matrix[Double]], Double, Matrix[Int]) =
   {
     if (queue.isEmpty)
@@ -41,12 +53,14 @@ class TspSolverWithBnb {
       val (newDestMat, newOptVal) = hungarianSolver.solve(maximize = false)
       val cycles = findAllCycles(newDestMat)
 
+      traceCallback(TraceData(iterNum, destMat, costs, newOptVal, optVal))
+
       if (newOptVal > optVal)
-        completeTask(newQueue, optVal, destMat)
+        completeTask(newQueue, optVal, destMat, iterNum + 1)
       else if (isFullCycle(newDestMat, cycles))
-        completeTask(newQueue, newOptVal, newDestMat)
+        completeTask(newQueue, newOptVal, newDestMat, iterNum + 1)
       else
-        completeTask(addSubTasks(newQueue, cycles, costs), optVal, destMat)
+        completeTask(addSubTasks(newQueue, cycles, costs), optVal, destMat, iterNum + 1)
     }
   }
 
