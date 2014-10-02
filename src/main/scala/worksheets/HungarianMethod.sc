@@ -1,4 +1,5 @@
-import hungarian_method.HungarianSolver
+import common.Matrix
+import hungarian_method.{Cost, HungarianSolver}
 object HungarianMethod {
   val matrix: Vector[Vector[Double]] =
     Vector(
@@ -36,4 +37,36 @@ object HungarianMethod {
       (mat, msg, mr, mc) => {}
     )
   val (res, opt) = solver.solve(maximize = true)
+
+
+
+
+
+
+  def buildLSequence(mat: Matrix[Cost], zeroRow: Int, zeroCol: Int) = {
+    def loop(mat: Matrix[Cost], currRow: Int, currCol: Int, sequence: List[(Int, Int)]): List[(Int, Int)] = {
+      val (newElemCol, newElemRow) =
+        if (mat(currRow, currCol).mark2)
+          (currRow, mat.col(currCol).indexWhere((c) => c.mark1))
+        else
+          (mat.row(currRow).indexWhere((c) => c.mark2), currCol)
+
+      if (newElemCol == -1 || newElemRow == -1)
+        sequence
+      else
+        loop(mat, newElemRow, newElemCol, sequence :+ (newElemRow, newElemCol))
+    }
+
+
+    loop(mat, zeroRow, zeroCol, List((zeroRow, zeroCol)))
+  }
+  val mat = new Matrix[Cost] (
+    Vector(
+      Vector(new Cost(0, true, false), new Cost(7, false, false), new Cost(7, false, false), new Cost(0, false, true)),
+      Vector(new Cost(0, false, true), new Cost(0, true, false), new Cost(1, false, false), new Cost(1, false, false)),
+      Vector(new Cost(0, false, true), new Cost(3, false, false), new Cost(0, true, false), new Cost(1, false, false)),
+      Vector(new Cost(1, false, false), new Cost(0, false, true), new Cost(3, false, false), new Cost(1, false, false))
+    )
+  )
+  buildLSequence(mat, 3, 1)
 }

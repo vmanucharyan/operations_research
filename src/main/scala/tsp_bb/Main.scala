@@ -1,7 +1,7 @@
 package tsp_bb
 
 import common.Matrix
-import hungarian_method.HungarianSolver
+import hungarian_method.Cost
 
 object Main {
   def main(args: Array[String]) {
@@ -26,11 +26,11 @@ object Main {
 
     val matrixTest = new Matrix[Double](
       Vector(
-        Vector[Double](0,   7,   1,    8,   7),
+        Vector[Double](  0,   7,   1,  8, 7),
         Vector[Double](  9, 0,   9,    2,   6),
         Vector[Double](  2,  12, 0,   11,  10),
-        Vector[Double](  9,   9,   12, 0,   4),
-        Vector[Double](  8,   1,   12,  10, 0)
+        Vector[Double](  9,   9, 12,  0,   4),
+        Vector[Double](  8,   1, 12,  10, 0)
       )
     )
 
@@ -49,6 +49,37 @@ object Main {
 
     println(opt)
     println(dmat)
+
+    def buildLSequence(mat: Matrix[Cost], zeroRow: Int, zeroCol: Int) = {
+      def loop(mat: Matrix[Cost], currRow: Int, currCol: Int, sequence: List[(Int, Int)]): List[(Int, Int)] =
+        if (mat(currRow, currCol).mark2) {
+          val newElemRow = mat.col(currCol).indexWhere((c) => c.mark1)
+          if (newElemRow != -1)
+            loop(mat, newElemRow, currCol, sequence :+ (newElemRow, currCol))
+          else
+            sequence
+        }
+        else {
+          val newElemCol = mat.row(currRow).indexWhere((c) => c.mark2)
+          if (newElemCol != -1)
+            loop(mat, currRow, newElemCol, sequence :+ (currRow, newElemCol))
+          else
+            sequence
+        }
+
+      loop(mat, zeroRow, zeroCol, List((zeroRow, zeroCol)))
+    }
+
+    val mat = new Matrix[Cost] (
+      Vector(
+        Vector(new Cost(0, true, false), new Cost(7, false, false), new Cost(7, false, false), new Cost(0, false, true)),
+        Vector(new Cost(0, false, true), new Cost(0, true, false), new Cost(1, false, false), new Cost(1, false, false)),
+        Vector(new Cost(0, false, true), new Cost(3, false, false), new Cost(0, true, false), new Cost(1, false, false)),
+        Vector(new Cost(1, false, false), new Cost(0, false, true), new Cost(3, false, false), new Cost(1, false, false))
+      )
+    )
+
+    println(buildLSequence(mat, 3, 1))
   }
 }
 
