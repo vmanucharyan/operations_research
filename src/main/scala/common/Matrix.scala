@@ -1,125 +1,68 @@
 package common
 
-class Matrix[T](val rows: Vector[Vector[T]]) {
-  val colCount = rows(0).length
+class Matrix[A](val rows: IndexedSeq[IndexedSeq[A]]) {
   val rowCount = rows.length
+  val colCount = rows(0).length
 
-  def this(rows: IndexedSeq[IndexedSeq[T]]) =
-    this((for (row <- rows) yield row.toVector).toVector)
+  lazy val cols: IndexedSeq[IndexedSeq[A]] = {
+    for (ri <- 0 until rows.length) yield
+      for (ci <- 0 until rows(0).length) yield rows(ci)(ri)
+  }
 
-  def this(rowCount: Int, colCount: Int, initializer: (Int, Int) => T) =
-    this(
-      for (ri <- 0 until rowCount) yield
-        for (ci <- 0 until colCount) yield initializer(ri, ci)
+  def apply(ri: Int) = rows(ri)
+  def apply(ri: Int, ci: Int) = rows(ri)(ci)
+
+  def flatten = rows.flatten
+
+  def mapRows[B](transform: IndexedSeq[A] => IndexedSeq[B]): Matrix[B] =
+    new Matrix[B] (
+      rows = for (row <- rows) yield transform(row)
     )
 
-  def apply(row: Int, col: Int) = rows(row)(col)
-  def apply(row: Int) = rows(row)
+  def mapRowsIndexed[B](transform: (IndexedSeq[A], Int) => IndexedSeq[B]): Matrix[B] =
+    new Matrix[B] (
+      rows = for (ri <- 0 until rowCount) yield transform(rows(ri), ri)
+    )
 
-  def flat() =
-    (for (ri <- 0 until rowCount; ci <- 0 until colCount) yield rows(ri)(ci)).toVector
+  def mapCols[B](transform: IndexedSeq[A] => IndexedSeq[B]): Matrix[B] =
+    Matrix.fromCols[B] (
+      cols = for (col <- cols) yield transform(col)
+    )
 
-  def map[B](func: (T, Int, Int) => B) =
-    new Matrix[B](
+  def mapColsIndexed[B](transform: (IndexedSeq[A], Int) => IndexedSeq[B]): Matrix[B] =
+    Matrix.fromCols[B] (
+      cols = for (ci <- 0 until colCount) yield transform(cols(ci), ci)
+    )
+
+  def map[B](transform: A => B): Matrix[B] =
+    new Matrix[B] (
+      rows =
+        for (row <- rows) yield
+          for (elem <- row) yield
+            transform(elem)
+    )
+
+  def mapIndexed[B](transform: (A, Int, Int) => B): Matrix[B] =
+    new Matrix[B] (
       for (ri <- 0 until rowCount) yield
         for (ci <- 0 until colCount) yield
-          func(rows(ri)(ci), ri, ci)
+          transform(rows(ri)(ci), ri, ci)
     )
 
-  def zip[B](other: Matrix[B]) =
-    new Matrix[(T, B)] (
-      for (ri <- 0 until rowCount) yield rows(ri).zip(other.rows(ri))
-    )
+  def max()(implicit ord: Ordering[A]): A = rows.flatten.max
+  def min()(implicit ord: Ordering[A]): A = rows.flatten.min
 
-  def zipWithIndexes() =
-    new Matrix[(T, Int, Int)](
-      for (ri <- 0 until rowCount) yield
-        for (ci <- 0 until colCount) yield (rows(ri)(ci), ri, ci)
-    )
-
-  def row(ri: Int): Vector[T] =
-    (for (ci <- 0 until colCount) yield rows(ri)(ci)).toVector
-
-  def col(ci: Int): Vector[T] =
-    (for (ri <- 0 until rowCount) yield rows(ri)(ci)).toVector
-
-  def rowFiltered(ri: Int, func: (T) => Boolean) =
-    (for (ci <- 0 until colCount if func(rows(ri)(ci))) yield (rows(ri)(ci), ci)).toVector
-
-  def colFiltered(ci: Int, func: (T) => Boolean) =
-    (for (ri <- 0 until rowCount if func(rows(ri)(ci))) yield (rows(ri)(ci), ri)).toVector
-
-  def setRow(ri: Int, newRow: Vector[T]) =
-    mapRows((row, index) => if (index == ri) newRow else row)
-
-  def setCol(ci: Int, newCol: Vector[T]) =
-    mapCols((col, index) => if (index == ci) newCol else col)
-
-  def mapRows(func: (Vector[T], Int) => Vector[T]) =
-    new Matrix[T] (
-      for (ri <- 0 until rowCount) yield
-        func(row(ri), ri)
-    )
-
-  def mapCols(func: (Vector[T], Int) => Vector[T]) =
-    Matrix.fromCols[T] (
-      for (ci <- 0 until colCount) yield
-        func(col(ci), ci)
-    )
-
-  def find(predicate: (T, Int, Int) => Boolean) =
-    for (ri <- 0 until rowCount; ci <- 0 until colCount if predicate(rows(ri)(ci), ri, ci))
-      yield (rows(ri)(ci), ri , ci)
-
-  def count(predicate: (T, Int, Int) => Boolean) =
-    (for (ri <- 0 until rowCount; ci <- 0 until colCount) yield
-      if (predicate(rows(ri)(ci), ri, ci)) 1 else 0).sum
-
-  def min[B](e: (T) => B, condition: (T, Int, Int) => Boolean = (_,_,_) => true)(implicit m: Ordering[B]) = {
-    val filtered =
-      for (ri <- 0 until rowCount; ci <- 0 until colCount if condition(rows(ri)(ci), ri, ci)) yield
-        (e(rows(ri)(ci)), ri, ci)
-
-    filtered.min
-  }
-
-  def max[B](e: (T) => B, condition: (T, Int, Int) => Boolean = (_,_,_) => true)(implicit m: Ordering[B]) = {
-    val filtered =
-      for (ri <- 0 until rowCount; ci <- 0 until colCount if condition(rows(ri)(ci), ri, ci)) yield
-        (e(rows(ri)(ci)), ri, ci)
-
-    filtered.max
-  }
-
-  override def equals(other: Any) : Boolean = {
-    def elementsAreEqual(mat: Matrix[T]) =
-      mat.flat() equals mat.flat()
-
-    if (!other.isInstanceOf[Matrix[T]])
-      false
-    else
-      elementsAreEqual(other.asInstanceOf[Matrix[T]])
-  }
-
-  override def toString = {
-    val sb = new StringBuilder()
-    for (ri <- 0 until rowCount) {
-      for (ci <- 0 until colCount) {
-        sb.append(s"${rows(ri)(ci)}\t\t\t")
-      }
-      sb.append("\n")
+  override def equals(that: Any) =
+    that match {
+      case thatMat: Matrix[A] => this.flatten equals thatMat.flatten
+      case _ => false
     }
-
-    sb.toString()
-
-//    rows.toString()
-  }
 }
 
 object Matrix {
-  def fromCols[T](cols: IndexedSeq[IndexedSeq[T]]) =
-    new Matrix[T] (
-      for (ri <- 0 until cols(0).length) yield
-        for (ci <- 0 until cols.length) yield cols(ci)(ri)
+  def fromCols[A](cols: IndexedSeq[IndexedSeq[A]]): Matrix[A] =
+    new Matrix (
+      for (ci <- 0 until cols.length) yield
+        for (ri <- 0 until cols(0).length) yield cols(ri)(ci)
     )
 }

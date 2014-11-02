@@ -1,11 +1,11 @@
 package tsp_bb
 
-import common.Matrix
+import common.MatrixOld
 import hungarian_method.Cost
 
 object Main {
   def main(args: Array[String]) {
-    val matrix = new Matrix[Double](
+    val matrix = new MatrixOld[Double](
       Vector[Vector[Double]](
         Vector(inf, 12, 14, 5, 12),
         Vector(11, inf, 12, 12, 4),
@@ -14,7 +14,7 @@ object Main {
         Vector(12, 12, 6, 15, inf)
       ))
 
-    val exampleMatrix = new Matrix[Double](
+    val exampleMatrix = new MatrixOld[Double](
       Vector[Vector[Double]](
         Vector(inf,  7,     1,     8,     7),
         Vector(9,  inf,     9,     2,     6),
@@ -24,7 +24,7 @@ object Main {
       )
     )
 
-    val matrixTest = new Matrix[Double](
+    val matrixTest = new MatrixOld[Double](
       Vector(
         Vector[Double](  0,   7,   1,  8, 7),
         Vector[Double](  9, 0,   9,    2,   6),
@@ -50,8 +50,8 @@ object Main {
     println(opt)
     println(dmat)
 
-    def buildLSequence(mat: Matrix[Cost], zeroRow: Int, zeroCol: Int) = {
-      def loop(mat: Matrix[Cost], currRow: Int, currCol: Int, sequence: List[(Int, Int)]): List[(Int, Int)] =
+    def buildLSequence(mat: MatrixOld[Cost], zeroRow: Int, zeroCol: Int) = {
+      def loop(mat: MatrixOld[Cost], currRow: Int, currCol: Int, sequence: List[(Int, Int)]): List[(Int, Int)] =
         if (mat(currRow, currCol).mark2) {
           val newElemRow = mat.col(currCol).indexWhere((c) => c.mark1)
           if (newElemRow != -1)
@@ -70,7 +70,7 @@ object Main {
       loop(mat, zeroRow, zeroCol, List((zeroRow, zeroCol)))
     }
 
-    val mat = new Matrix[Cost] (
+    val mat = new MatrixOld[Cost] (
       Vector(
         Vector(new Cost(0, true, false), new Cost(7, false, false), new Cost(7, false, false), new Cost(0, false, true)),
         Vector(new Cost(0, false, true), new Cost(0, true, false), new Cost(1, false, false), new Cost(1, false, false)),

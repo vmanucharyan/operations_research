@@ -1,7 +1,7 @@
 package transportation_problem
 
-import common.Matrix2
+import common.Matrix
 
 trait FeasibleSolutionFinder {
-  def apply(costMatrix: Matrix2[Double]): Matrix2[Double]
+  def apply(costMatrix: Matrix[Double]): Matrix[Double]
 }

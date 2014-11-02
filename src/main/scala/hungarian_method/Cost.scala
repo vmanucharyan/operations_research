@@ -1,6 +1,6 @@
 package hungarian_method
 
-import common.Matrix
+import common.MatrixOld
 
 import scala.collection.mutable
 
@@ -11,12 +11,12 @@ class Cost(val value: Double, val mark1: Boolean, var mark2: Boolean) {
 
 object CostMatrix {
   def fromValues(values: Vector[Vector[Double]]) =
-    new Matrix[Cost] (
+    new MatrixOld[Cost] (
       for (ri <- 0 until values.length) yield
         for (ci <- 0 until values(0).length) yield new Cost(values(ri)(ci))
     )
 
-  def toString(mat: Matrix[Cost], markedRows: mutable.Set[Int], markedCols: mutable.Set[Int]) = {
+  def toString(mat: MatrixOld[Cost], markedRows: mutable.Set[Int], markedCols: mutable.Set[Int]) = {
     val sb = new mutable.StringBuilder()
     sb.append("\t")
     for (ci <- 0 until mat.colCount) {

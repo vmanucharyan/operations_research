@@ -1,9 +1,9 @@
-import common.Matrix
+import common.MatrixOld$
 import hungarian_method.HungarianSolver
 import scala.collection.immutable.Queue
 object TravellingSalesmanBB {
   def inf = Double.PositiveInfinity
-  val costMat = new Matrix[Double] (
+  val costMat = new MatrixOld[Double] (
     Vector(
       Vector[Double](inf,   7,   1,    8,   7),
       Vector[Double](  9, inf,   9,    2,   6),
@@ -12,7 +12,7 @@ object TravellingSalesmanBB {
       Vector[Double](  8,   1,   12,  10, inf)
     )
   )
-  val xmat = new Matrix[Int] (
+  val xmat = new MatrixOld[Int] (
     Vector(
       Vector(0, 0, 1, 0, 0),
       Vector(0, 0, 0, 1, 0),
@@ -22,7 +22,7 @@ object TravellingSalesmanBB {
     )
   )
 
-  val matrixTest = new Matrix[Double] (
+  val matrixTest = new MatrixOld[Double] (
     Vector(
       Vector[Double](0,   7,   1,    8,   7),
       Vector[Double](  9, 0,   9,    2,   6),
@@ -32,7 +32,7 @@ object TravellingSalesmanBB {
     )
   )
 
-  def isFullCycle(destMat: Matrix[Int], cycle: List[List[(Int, Int)]]): Boolean =
+  def isFullCycle(destMat: MatrixOld[Int], cycle: List[List[(Int, Int)]]): Boolean =
     cycle.length == 1 && cycle(0).length == destMat.rowCount
 
   isFullCycle(xmat, List(List((0,3), (3,0)), List((1,4), (4,2), (2,1))))

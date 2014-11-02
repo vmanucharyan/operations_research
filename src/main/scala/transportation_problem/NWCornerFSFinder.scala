@@ -1,7 +1,7 @@
 package transportation_problem
 
-import common.Matrix2
+import common.Matrix
 
 class NWCornerFSFinder extends FeasibleSolutionFinder {
-  override def apply(costMatrix: Matrix2[Double]): Matrix2[Double] = ???
+  override def apply(costMatrix: Matrix[Double]): Matrix[Double] = ???
 }

@@ -1,17 +1,17 @@
 package tsp_bb
 
-import common.Matrix
+import common.MatrixOld
 import hungarian_method.HungarianSolver
 import scala.collection.immutable.Queue
 
 case class TraceData(iterationNum: Int,
-                     destMat: Matrix[Int],
-                     costMat: Matrix[Double],
+                     destMat: MatrixOld[Int],
+                     costMat: MatrixOld[Double],
                      f0: Double,
                      fs: Double)
 
 class TspSolverWithBnb(val traceCallback: (TraceData) => Unit = (_: TraceData) => {}) {
-  def solve(costs: Matrix[Double]) = {
+  def solve(costs: MatrixOld[Double]) = {
     val initialDestinations = buildInitialDestMatrix(costs.rowCount)
     val taskQueue = Queue(costs)
     val (_, optVal, destMat) =
@@ -24,7 +24,7 @@ class TspSolverWithBnb(val traceCallback: (TraceData) => Unit = (_: TraceData) =
     (optVal, destMat)
   }
 
-  private def optimalValue(destMat: Matrix[Int], costMat: Matrix[Double]) =
+  private def optimalValue(destMat: MatrixOld[Int], costMat: MatrixOld[Double]) =
     costMat
       .flat().zip(destMat.flat())
       .filter { case (c, x) => !c.isInfinity }
@@ -36,14 +36,14 @@ class TspSolverWithBnb(val traceCallback: (TraceData) => Unit = (_: TraceData) =
       for (i <- 0 until n) yield if (i != n - 1) i + 1 else 0)
 
   private def destMatrixFromFullCycle(seq: IndexedSeq[Int]) =
-    new Matrix[Int](
+    new MatrixOld[Int](
       rowCount = seq.size,
       colCount = seq.size,
       initializer = (ri, ci) => if (seq(ri) == ci) 1 else 0
     )
 
-  private def completeTask(queue: Queue[Matrix[Double]], optVal: Double, destMat: Matrix[Int], iterNum: Int)
-  : (Queue[Matrix[Double]], Double, Matrix[Int]) =
+  private def completeTask(queue: Queue[MatrixOld[Double]], optVal: Double, destMat: MatrixOld[Int], iterNum: Int)
+  : (Queue[MatrixOld[Double]], Double, MatrixOld[Int]) =
   {
     if (queue.isEmpty)
       (queue, optVal, destMat)
@@ -64,8 +64,8 @@ class TspSolverWithBnb(val traceCallback: (TraceData) => Unit = (_: TraceData) =
     }
   }
 
-  private def findAllCycles(destMat: Matrix[Int]) = {
-    def transitionsFromMatrix(destMat: Matrix[Int]) =
+  private def findAllCycles(destMat: MatrixOld[Int]) = {
+    def transitionsFromMatrix(destMat: MatrixOld[Int]) =
       for (row <- 0 until destMat.rowCount) yield
         (row, destMat.rows(row).indexOf(1))
 
@@ -96,12 +96,12 @@ class TspSolverWithBnb(val traceCallback: (TraceData) => Unit = (_: TraceData) =
     foundCycles
   }
 
-  private def isFullCycle(destMat: Matrix[Int], cycle: List[List[(Int, Int)]]): Boolean =
+  private def isFullCycle(destMat: MatrixOld[Int], cycle: List[List[(Int, Int)]]): Boolean =
     cycle.length == 1 && cycle(0).length == destMat.rowCount
 
-  private def addSubTasks(queue: Queue[Matrix[Double]], cycles: List[List[(Int, Int)]], costMatrix: Matrix[Double]) = {
-    def createSubTask(queue: Queue[Matrix[Double]], cycle: List[(Int,Int)], task: Matrix[Double])
-    : (Queue[Matrix[Double]], List[(Int,Int)]) =
+  private def addSubTasks(queue: Queue[MatrixOld[Double]], cycles: List[List[(Int, Int)]], costMatrix: MatrixOld[Double]) = {
+    def createSubTask(queue: Queue[MatrixOld[Double]], cycle: List[(Int,Int)], task: MatrixOld[Double])
+    : (Queue[MatrixOld[Double]], List[(Int,Int)]) =
     {
       if (cycle.isEmpty)
         (queue, cycle)

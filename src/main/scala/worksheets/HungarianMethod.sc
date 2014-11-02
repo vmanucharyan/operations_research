@@ -1,4 +1,4 @@
-import common.Matrix
+import common.MatrixOld$
 import hungarian_method.{Cost, HungarianSolver}
 object HungarianMethod {
   val matrix: Vector[Vector[Double]] =
@@ -43,8 +43,8 @@ object HungarianMethod {
 
 
 
-  def buildLSequence(mat: Matrix[Cost], zeroRow: Int, zeroCol: Int) = {
-    def loop(mat: Matrix[Cost], currRow: Int, currCol: Int, sequence: List[(Int, Int)]): List[(Int, Int)] = {
+  def buildLSequence(mat: MatrixOld[Cost], zeroRow: Int, zeroCol: Int) = {
+    def loop(mat: MatrixOld[Cost], currRow: Int, currCol: Int, sequence: List[(Int, Int)]): List[(Int, Int)] = {
       val (newElemCol, newElemRow) =
         if (mat(currRow, currCol).mark2)
           (currRow, mat.col(currCol).indexWhere((c) => c.mark1))
@@ -60,7 +60,7 @@ object HungarianMethod {
 
     loop(mat, zeroRow, zeroCol, List((zeroRow, zeroCol)))
   }
-  val mat = new Matrix[Cost] (
+  val mat = new MatrixOld[Cost] (
     Vector(
       Vector(new Cost(0, true, false), new Cost(7, false, false), new Cost(7, false, false), new Cost(0, false, true)),
       Vector(new Cost(0, false, true), new Cost(0, true, false), new Cost(1, false, false), new Cost(1, false, false)),
