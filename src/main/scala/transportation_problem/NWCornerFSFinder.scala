@@ -18,6 +18,28 @@ class NWCornerFSFinder extends FeasibleSolutionFinder {
     }
 
     def iter(p: TransportPack): TransportPack = {
+      def updateMatrix(nwRow: Int, nwCol: Int, s: IndexedSeq[Double], d: IndexedSeq[Double]) = {
+        val min = math.min(p.consCap(nwCol), p.prodCap(nwRow))
+        if (s(nwRow) == 0)
+          p.costs.mapRow(
+            nwRow,
+            (row) => row.mapIndexed((v, i) =>
+              if (i == nwCol) min
+              else if (v == 0) nan
+              else v
+            )
+          )
+        else
+          p.costs.mapCol(
+            nwCol,
+            (col) => col.mapIndexed((v, i) =>
+              if (i == nwRow) min
+              else if (v == 0) nan
+              else v
+            )
+          )
+      }
+
       val (nwRow, nwCol) = nwCorner(p.costs)
 
       if (nwRow == -1) p
@@ -25,30 +47,12 @@ class NWCornerFSFinder extends FeasibleSolutionFinder {
         val min = math.min(p.consCap(nwCol), p.prodCap(nwRow))
         val s = p.prodCap.updated(nwRow, p.prodCap(nwRow) - min)
         val d = p.consCap.updated(nwCol, p.consCap(nwCol) - min)
-
-        val costs =
-          if (s(nwRow) == 0)
-            p.costs.mapRow(
-              nwRow,
-              (row) => row.mapIndexed((v, i) =>
-                if (i == nwCol) min
-                else if (v == 0) nan
-                else v
-              )
-            )
-          else
-            p.costs.mapCol(
-              nwCol,
-              (col) => col.mapIndexed((v, i) =>
-                if (i == nwRow) min
-                else if (v == 0) nan
-                else v
-              )
-            )
+        val costs = updateMatrix(nwRow, nwCol, s, d)
 
         iter(new TransportPack(costs, s, d))
       }
     }
+
     val res = iter(
       new TransportPack(
         costs = new Matrix(problem.costs.rowCount, problem.costs.colCount, (_,_) => 0.0),
