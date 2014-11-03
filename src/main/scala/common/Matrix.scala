@@ -1,18 +1,37 @@
 package common
 
 class Matrix[A](val rows: IndexedSeq[IndexedSeq[A]]) {
+  def this (rows: Int, cols: Int, init: (Int, Int) => A) =
+    this(
+      for (ri <- 0 until rows) yield
+        for (ci <- 0 until cols) yield
+          init(ri, ci)
+    )
+
   val rowCount = rows.length
   val colCount = rows(0).length
 
   lazy val cols: IndexedSeq[IndexedSeq[A]] = {
-    for (ri <- 0 until rows.length) yield
-      for (ci <- 0 until rows(0).length) yield rows(ci)(ri)
+    for (ci <- 0 until colCount) yield
+      for (ri <- 0 until rowCount) yield rows(ri)(ci)
   }
 
   def apply(ri: Int) = rows(ri)
   def apply(ri: Int, ci: Int) = rows(ri)(ci)
 
   def flatten = rows.flatten
+
+  def setCol(col: IndexedSeq[A], colIndex: Int) =
+    mapCol(colIndex, c => col)
+
+  def setRow(row: IndexedSeq[A], rowIndex: Int) =
+    mapRow(rowIndex, r => row)
+
+  def mapRow(rowIndex: Int, transform: IndexedSeq[A] => IndexedSeq[A]): Matrix[A] =
+    mapRowsIndexed((row, index) => if (index == rowIndex) transform(row) else row)
+
+  def mapCol(colIndex: Int, transform: IndexedSeq[A] => IndexedSeq[A]): Matrix[A] =
+    mapColsIndexed((col, index) => if (index == colIndex) transform(col) else col)
 
   def mapRows[B](transform: IndexedSeq[A] => IndexedSeq[B]): Matrix[B] =
     new Matrix[B] (
@@ -62,7 +81,7 @@ class Matrix[A](val rows: IndexedSeq[IndexedSeq[A]]) {
 object Matrix {
   def fromCols[A](cols: IndexedSeq[IndexedSeq[A]]): Matrix[A] =
     new Matrix (
-      for (ci <- 0 until cols.length) yield
-        for (ri <- 0 until cols(0).length) yield cols(ri)(ci)
+      for (ri <- 0 until cols(0).length) yield
+        for (ci <- 0 until cols.length) yield cols(ci)(ri)
     )
 }

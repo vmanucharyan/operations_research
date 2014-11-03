@@ -1,4 +1,4 @@
-import common.MatrixOld$
+import common.MatrixOld
 import hungarian_method.{Cost, HungarianSolver}
 object HungarianMethod {
   val matrix: Vector[Vector[Double]] =

@@ -1,4 +1,4 @@
-import common.MatrixOld$
+import common.MatrixOld
 import hungarian_method.HungarianSolver
 import scala.collection.immutable.Queue
 object TravellingSalesmanBB {

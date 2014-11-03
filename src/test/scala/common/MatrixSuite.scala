@@ -6,25 +6,35 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class MatrixSuite extends FunSuite {
-  test("Matrix from rows equals to same matrix created from cols") {
-    val matRows = new Matrix[Int](
-      Vector(
-        Vector(1, 2, 3, 4),
-        Vector(5, 6, 7, 8),
-        Vector(9, 8, 7, 6),
-        Vector(5, 4, 3, 2)
-      )
+  val testMatrix = new Matrix[Int](
+    Vector(
+      Vector(1, 2, 3),
+      Vector(5, 6, 7),
+      Vector(9, 8, 7),
+      Vector(5, 4, 3)
     )
+  )
 
+  test("Matrix from cols") {
     val matCols = Matrix.fromCols[Int](
       Vector(
         Vector(1, 5, 9, 5),
         Vector(2, 6, 8, 4),
-        Vector(3, 7, 7, 3),
-        Vector(4, 8, 6, 2)
+        Vector(3, 7, 7, 3)
       )
     )
 
-    assert(matRows == matCols)
+    assert(testMatrix == matCols)
+  }
+
+  test("Matrix cols") {
+    val matCols =
+      Vector(
+        Vector(1, 5, 9, 5),
+        Vector(2, 6, 8, 4),
+        Vector(3, 7, 7, 3)
+      )
+
+    assert(testMatrix.cols equals matCols)
   }
 }

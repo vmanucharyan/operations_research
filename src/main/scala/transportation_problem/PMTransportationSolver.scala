@@ -1,7 +1,7 @@
 package transportation_problem
 
-import common.MatrixOld
+import common.Matrix
 
 class PMTransportationSolver extends TransportationSolver {
-  override def solve(problem: MatrixOld[Double]): MatrixOld[Double] = ???
+  override def solve(problem: TransportPack): Matrix[Double] = ???
 }

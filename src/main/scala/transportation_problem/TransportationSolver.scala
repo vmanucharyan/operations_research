@@ -1,7 +1,7 @@
 package transportation_problem
 
-import common.MatrixOld
+import common.Matrix
 
 trait TransportationSolver {
-  def solve(costs: MatrixOld[Double]): MatrixOld[Double]
+  def solve(problem: TransportPack): Matrix[Double]
 }
