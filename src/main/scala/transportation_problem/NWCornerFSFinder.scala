@@ -25,7 +25,7 @@ class NWCornerFSFinder extends FeasibleSolutionFinder {
             nwRow,
             (row) => row.mapIndexed((v, i) =>
               if (i == nwCol) min
-              else if (v == 0) nan
+              else if (v == 0) --
               else v
             )
           )
@@ -34,7 +34,7 @@ class NWCornerFSFinder extends FeasibleSolutionFinder {
             nwCol,
             (col) => col.mapIndexed((v, i) =>
               if (i == nwRow) min
-              else if (v == 0) nan
+              else if (v == 0) --
               else v
             )
           )

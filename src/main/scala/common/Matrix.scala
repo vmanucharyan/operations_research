@@ -61,6 +61,13 @@ class Matrix[A](val rows: IndexedSeq[IndexedSeq[A]]) {
             transform(elem)
     )
 
+  def flatMap[B](transform: (A,Int,Int) => B, condition: (A, Int, Int) => Boolean = (_,_,_) => true): IndexedSeq[B] =
+    for {
+      ri <- 0 until rowCount
+      ci <- 0 until colCount
+      if condition(rows(ri)(ci), ri, ci)
+    } yield transform(rows(ri)(ci), ri, ci)
+
   def mapIndexed[B](transform: (A, Int, Int) => B): Matrix[B] =
     new Matrix[B] (
       for (ri <- 0 until rowCount) yield

@@ -8,7 +8,7 @@ import transportation_problem.{PMTransportationSolver, NWCornerFSFinder, Transpo
 
 @RunWith(classOf[JUnitRunner])
 class TransportSuite extends FunSuite{
-  val nan = Double.NegativeInfinity
+  val -- = Double.NegativeInfinity
 
   val nwCorner = new NWCornerFSFinder()
   val tp = new TransportPack (
@@ -25,9 +25,9 @@ class TransportSuite extends FunSuite{
   test("nw corner test") {
     val expectedResult = new Matrix[Double](
       Vector(
-        Vector(  5,   5, nan, nan),
-        Vector(nan,  15, nan, nan),
-        Vector(nan,   5,  10,  10)
+        Vector( 5,  5, --,  --),
+        Vector(--, 15, --,  --),
+        Vector(--,  5, 10,  10)
       ))
 
     val result = nwCorner.find(tp)
@@ -54,5 +54,12 @@ class TransportSuite extends FunSuite{
 
     assert(solution.v equals expectedSolution.v)
     assert(solution.u equals expectedSolution.u)
+  }
+
+  test("improve solution") {
+    val solver = new PMTransportationSolver(new NWCornerFSFinder())
+    solver.solve(tp)
+
+    assert(false)
   }
 }
