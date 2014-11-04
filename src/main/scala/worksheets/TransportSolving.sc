@@ -1,18 +1,14 @@
-package transportation_problem
+package worksheets
 
-import common.Matrix
+import common.IndexedSeqExt._
 
-class PMTransportationSolver(val fsFinder: FeasibleSolutionFinder) extends TransportationSolver {
+object TransportSolving {
   class Equation(val ui: Int, val vi: Int, val ans: Double)
   class EqSolution(val u: Map[Int, Double], val v: Map[Int, Double])
 
-  override def solve(problem: TransportPack): Matrix[Double] = ???
-
-  private def improveSolution(table: TransportPack): TransportPack = ???
-
   def solveEqSystem(equations: IndexedSeq[Equation])= {
     def iter(known: EqSolution): EqSolution = {
-      if (known.u.size + known.v.size == equations.length + 1)
+      if (known.u.size + known.v.size == equations.length)
         known
       else {
         val canSolveV = equations.filter(e => known.u.contains(e.ui))
@@ -24,6 +20,17 @@ class PMTransportationSolver(val fsFinder: FeasibleSolutionFinder) extends Trans
       }
     }
 
-    iter(new EqSolution(Map(equations(0).ui -> 0.0), Map()))
+    iter(new EqSolution(Map(0 -> 0.0), Map()))
   }
+
+  val system = IndexedSeq(
+    new Equation(1, 1, 3),
+    new Equation(1, 2, 3),
+    new Equation(2, 2, 6),
+    new Equation(3, 2, 2),
+    new Equation(3, 3, 3),
+    new Equation(3, 4, 4)
+  )
+
+  solveEqSystem(system)
 }
