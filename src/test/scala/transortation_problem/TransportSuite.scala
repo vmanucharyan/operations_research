@@ -4,7 +4,7 @@ import common.Matrix
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-import transportation_problem.{PMTransportationSolver, NWCornerFSFinder, TransportPack}
+import transportation_problem._
 
 @RunWith(classOf[JUnitRunner])
 class TransportSuite extends FunSuite{
@@ -36,7 +36,7 @@ class TransportSuite extends FunSuite{
 
   test("equation solver") {
     val solver = new PMTransportationSolver(new NWCornerFSFinder())
-    val expectedSolution = new solver.EqSolution(
+    val expectedSolution = new solver.EquationSolution(
       u = Map(1 -> 0.0, 2 -> 3.0, 3 -> -1.0),
       v = Map(1 -> 3.0, 2 -> 3.0, 3 -> 4.0, 4 -> 5.0)
     )
@@ -54,6 +54,21 @@ class TransportSuite extends FunSuite{
 
     assert(solution.v equals expectedSolution.v)
     assert(solution.u equals expectedSolution.u)
+  }
+
+  test ("transport cycle builder") {
+    val builder = new TransportCycleBuilder()
+    val basis = Seq((0, 0), (0, 1), (1, 1), (2, 1), (2, 2), (2, 3))
+    val route = builder.findCycle(basis, firstRow = 0, firstCol = 3)
+
+    val expectedRoute = new Route(Seq(
+      new CycleCell(0, 3, true, true, true),
+      new CycleCell(0, 1, false, false),
+      new CycleCell(2, 1, true, true),
+      new CycleCell(2, 3, false, false)
+    ))
+
+    assert(route equals expectedRoute)
   }
 
   test("improve solution") {

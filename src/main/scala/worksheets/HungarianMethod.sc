@@ -38,11 +38,6 @@ object HungarianMethod {
     )
   val (res, opt) = solver.solve(maximize = true)
 
-
-
-
-
-
   def buildLSequence(mat: MatrixOld[Cost], zeroRow: Int, zeroCol: Int) = {
     def loop(mat: MatrixOld[Cost], currRow: Int, currCol: Int, sequence: List[(Int, Int)]): List[(Int, Int)] = {
       val (newElemCol, newElemRow) =
