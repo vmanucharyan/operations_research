@@ -43,9 +43,7 @@ class TransportCycleBuilder {
       }
     }
 
-    def canReachFirst(route: Route, cell: CycleCell) =
-      if (cell.reachedByCol) cell.row == route.seq(0).row
-      else cell.col == route.seq(0).col
+    def canReachFirst(route: Route, cell: CycleCell) = cell.canReach(route.seq(0))
 
     def findCycle(route: Route, cell: CycleCell): Option[Route] = {
       val cellsToGo = waysToGo(route, cell)

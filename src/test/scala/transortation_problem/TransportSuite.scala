@@ -10,19 +10,19 @@ import transportation_problem._
 class TransportSuite extends FunSuite{
   val -- = Double.NegativeInfinity
 
-  val nwCorner = new NWCornerFSFinder()
-  val tp = new TransportPack (
-    costs = new Matrix[Double] (
-      Vector(
-        Vector(3, 3, 5, 1),
-        Vector(4, 6, 7, 8),
-        Vector(5, 2, 3, 4)
-      )),
-    prodCap = Vector[Double](10, 15, 25),
-    consCap = Vector[Double](5, 25, 10, 10)
-  )
-
   test("nw corner test") {
+    val nwCorner = new NWCornerFSFinder()
+    val tp = new TransportPack (
+      costs = new Matrix[Double] (
+        Vector(
+          Vector(3, 3, 5, 1),
+          Vector(4, 6, 7, 8),
+          Vector(5, 2, 3, 4)
+        )),
+      prodCap = Vector[Double](10, 15, 25),
+      consCap = Vector[Double](5, 25, 10, 10)
+    )
+
     val expectedResult = new Matrix[Double](
       Vector(
         Vector( 5,  5, --,  --),
@@ -71,10 +71,58 @@ class TransportSuite extends FunSuite{
     assert(route equals expectedRoute)
   }
 
-  test("improve solution") {
+  test("modify bsf") {
     val solver = new PMTransportationSolver(new NWCornerFSFinder())
-    solver.solve(tp)
+    val d = IndexedSeq (
+      ((0, 2), 1.0),
+      ((0, 3), -4.0),
+      ((1, 2), 0.0),
+      ((1, 3), 0.0),
+      ((1, 0), -2.0),
+      ((2, 0), 3.0)
+    )
+    val bsf = new Matrix[Double](
+      Vector(
+        Vector( 5,  5, --,  --),
+        Vector(--, 15, --,  --),
+        Vector(--,  5, 10,  10)
+      ))
 
-    assert(false)
+    val expectedResult = new Matrix[Double](
+      Vector(
+        Vector( 5, --, --,   5),
+        Vector(--, 15, --,  --),
+        Vector(--, 10, 10,   5)
+      ))
+
+    val result = solver.modifyBsf(d, bsf)
+
+    assert(result equals expectedResult)
+  }
+
+  test("solve") {
+    val solver = new PMTransportationSolver(new NWCornerFSFinder())
+
+    val tp = new TransportPack (
+      costs = new Matrix[Double] (
+        Vector(
+          Vector(10, 7, 6, 8),
+          Vector(5, 6, 5, 4),
+          Vector(8, 7, 6, 7)
+        )),
+      prodCap = Vector[Double](31, 48, 38),
+      consCap = Vector[Double](22, 34, 41, 20)
+    )
+
+    val expectedResult = new Matrix[Double](
+      Vector(
+        Vector(--, 31, --,  --),
+        Vector(22,  3,  3,  20),
+        Vector(--, --, 38,  --)
+      ))
+
+    val result = solver.solve(tp)
+
+    assert(result equals expectedResult)
   }
 }

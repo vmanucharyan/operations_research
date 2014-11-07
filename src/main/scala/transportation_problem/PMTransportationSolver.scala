@@ -3,7 +3,6 @@ package transportation_problem
 import common.Matrix
 
 class PMTransportationSolver(val fsFinder: FeasibleSolutionFinder) extends TransportationSolver {
-
   case class Equation(ui: Int, vi: Int, ans: Double)
   case class EquationSolution(u: Map[Int, Double], v: Map[Int, Double])
 
@@ -11,9 +10,7 @@ class PMTransportationSolver(val fsFinder: FeasibleSolutionFinder) extends Trans
 
   override def solve(problem: TransportPack): Matrix[Double] = {
     val firstBsf = fsFinder.find(problem)
-    val solution = improveSolution(problem, firstBsf)
-
-    ???
+    improveSolution(problem, firstBsf)
   }
 
   def improveSolution(problem: TransportPack, bsf: Matrix[Double]): Matrix[Double] = {
@@ -57,7 +54,7 @@ class PMTransportationSolver(val fsFinder: FeasibleSolutionFinder) extends Trans
     iter(new EquationSolution(firstKnowns, Map()))
   }
 
-  def modifyBsf(d: IndexedSeq[((Int, Int), Double)], bsf: Matrix[Double]): Matrix[Double] = {
+  def modifyBsf(d: Iterable[((Int, Int), Double)], bsf: Matrix[Double]): Matrix[Double] = {
     def getAllBasisCells(): Seq[(Int, Int)] =
       bsf.flatMap(
         condition = (v, ri, ci) => v >= 0,
@@ -67,7 +64,27 @@ class PMTransportationSolver(val fsFinder: FeasibleSolutionFinder) extends Trans
     val ((minRow, minCol), minValue) = d minBy (x => x._2)
     val cycle = cycleBuilder.findCycle(getAllBasisCells(), minRow, minCol)
 
-    ???
+    val cellToExclude = cycle.seq
+      .filter(cell => !cell.markPlus)
+      .minBy(cell => bsf(cell.row, cell.col))
+
+    val excludeValue = bsf(cellToExclude.row, cellToExclude.col)
+
+    bsf.mapIndexed(
+      (v, r, c) =>
+        if (r == cellToExclude.row && c == cellToExclude.col) --
+        else if (r == minRow && c == minCol) excludeValue
+        else {
+          val cycleCell = cycle.seq.find(cell => cell.row == r && cell.col == c)
+          cycleCell match {
+            case Some(cell) =>
+              if (cell.markPlus) bsf(cell.row, cell.col) + excludeValue
+              else bsf(cell.row, cell.col) - excludeValue
+
+            case None => bsf(r, c)
+          }
+        }
+    )
   }
 
 }
