@@ -2,7 +2,10 @@ package transportation_problem
 
 import common.Matrix
 
-class PMTransportationSolver(val fsFinder: FeasibleSolutionFinder) extends TransportationSolver {
+class PMTransportationSolver(val fsFinder: FeasibleSolutionFinder,
+                             val callback: (Route, Matrix[Double], Int) => Unit = (_,_,_) => Unit)
+  extends TransportationSolver
+{
   case class Equation(ui: Int, vi: Int, ans: Double)
   case class EquationSolution(u: Map[Int, Double], v: Map[Int, Double])
 
@@ -10,10 +13,10 @@ class PMTransportationSolver(val fsFinder: FeasibleSolutionFinder) extends Trans
 
   override def solve(problem: TransportPack): Matrix[Double] = {
     val firstBsf = fsFinder.find(problem)
-    improveSolution(problem, firstBsf)
+    improveSolution(problem, firstBsf, 1)
   }
 
-  def improveSolution(problem: TransportPack, bsf: Matrix[Double]): Matrix[Double] = {
+  def improveSolution(problem: TransportPack, bsf: Matrix[Double], iter: Int = 0): Matrix[Double] = {
     val eqSystem = bsf.flatMap(
       condition = (v, _, _) => v >= 0,
       transform = (v, ri, ci) => new Equation(ri, ci, problem.costs(ri, ci))
@@ -29,8 +32,9 @@ class PMTransportationSolver(val fsFinder: FeasibleSolutionFinder) extends Trans
 
     if (!(d exists (e => e._2 < 0))) bsf
     else {
-      val modifiedBsf = modifyBsf(d, bsf)
-      improveSolution(problem, modifiedBsf)
+      val (modifiedBsf, cycle) = modifyBsf(d, bsf)
+      callback(cycle, bsf, iter)
+      improveSolution(problem, modifiedBsf, iter + 1)
     }
   }
 
@@ -54,7 +58,7 @@ class PMTransportationSolver(val fsFinder: FeasibleSolutionFinder) extends Trans
     iter(new EquationSolution(firstKnowns, Map()))
   }
 
-  def modifyBsf(d: Iterable[((Int, Int), Double)], bsf: Matrix[Double]): Matrix[Double] = {
+  def modifyBsf(d: Iterable[((Int, Int), Double)], bsf: Matrix[Double]): (Matrix[Double], Route) = {
     def getAllBasisCells(): Seq[(Int, Int)] =
       bsf.flatMap(
         condition = (v, ri, ci) => v >= 0,
@@ -70,7 +74,7 @@ class PMTransportationSolver(val fsFinder: FeasibleSolutionFinder) extends Trans
 
     val excludeValue = bsf(cellToExclude.row, cellToExclude.col)
 
-    bsf.mapIndexed(
+    val newMatrix = bsf.mapIndexed(
       (v, r, c) =>
         if (r == cellToExclude.row && c == cellToExclude.col) --
         else if (r == minRow && c == minCol) excludeValue
@@ -85,6 +89,8 @@ class PMTransportationSolver(val fsFinder: FeasibleSolutionFinder) extends Trans
           }
         }
     )
+
+    (newMatrix, cycle)
   }
 
 }

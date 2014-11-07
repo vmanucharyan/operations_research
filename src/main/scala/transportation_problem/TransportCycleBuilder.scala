@@ -43,14 +43,18 @@ class TransportCycleBuilder {
       }
     }
 
-    def canReachFirst(route: Route, cell: CycleCell) = cell.canReach(route.seq(0))
+    def canReachFirst(route: Route, cell: CycleCell) = route.seq.nonEmpty && cell.canReach(route.seq(0))
 
     def findCycle(route: Route, cell: CycleCell): Option[Route] = {
       val cellsToGo = waysToGo(route, cell)
 
-      if (cellsToGo.isEmpty && canReachFirst(route, cell))
+//      System.out.println("======================")
+//      System.out.println(cellsToGo)
+//      System.out.println(route)
+
+      if (canReachFirst(route, cell))
         Some(route append cell)
-      else if (cellsToGo.isEmpty && !canReachFirst(route, cell))
+      else if (cellsToGo.isEmpty)
         None
       else {
         val possibleRoutes = cellsToGo map (c => findCycle(route append cell, c))

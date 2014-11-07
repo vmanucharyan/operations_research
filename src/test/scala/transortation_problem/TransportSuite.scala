@@ -95,7 +95,7 @@ class TransportSuite extends FunSuite{
         Vector(--, 10, 10,   5)
       ))
 
-    val result = solver.modifyBsf(d, bsf)
+    val (result, cycle) = solver.modifyBsf(d, bsf)
 
     assert(result equals expectedResult)
   }

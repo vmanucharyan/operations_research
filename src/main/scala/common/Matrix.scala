@@ -21,6 +21,9 @@ class Matrix[A](val rows: IndexedSeq[IndexedSeq[A]]) {
 
   def flatten = rows.flatten
 
+  def setValue(value: A, row: Int, col: Int) =
+    this.mapIndexed((v, r, c) => if (r == row && c == col) value else v)
+
   def setCol(col: IndexedSeq[A], colIndex: Int) =
     mapCol(colIndex, c => col)
 
