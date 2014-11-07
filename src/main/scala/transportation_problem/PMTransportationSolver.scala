@@ -59,14 +59,14 @@ class PMTransportationSolver(val fsFinder: FeasibleSolutionFinder,
   }
 
   def modifyBsf(d: Iterable[((Int, Int), Double)], bsf: Matrix[Double]): (Matrix[Double], Route) = {
-    def getAllBasisCells(): Seq[(Int, Int)] =
+    def allBasisCells: Seq[(Int, Int)] =
       bsf.flatMap(
         condition = (v, ri, ci) => v >= 0,
         transform = (v, ri, ci) => (ri, ci)
       )
 
     val ((minRow, minCol), minValue) = d minBy (x => x._2)
-    val cycle = cycleBuilder.findCycle(getAllBasisCells(), minRow, minCol)
+    val cycle = cycleBuilder.findCycle(allBasisCells, minRow, minCol)
 
     val cellToExclude = cycle.seq
       .filter(cell => !cell.markPlus)
